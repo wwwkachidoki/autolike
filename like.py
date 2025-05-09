@@ -11,18 +11,18 @@ client = tweepy.Client(
     access_token_secret=os.environ['ACCESS_TOKEN_SECRET']
 )
 
-# ✅ Secretsからアカウント名を取得
+# アカウント名をSecretsから取得（例：wagyu_worldwide）
 username = os.environ['TWITTER_USERNAME']
 
 # 自分のユーザーIDを取得
 try:
-    my_user = client.get_user(username="wagyu_worldwide")
+    my_user = client.get_user(username=username)
     my_user_id = my_user.data.id
 except Exception as e:
     print(f"Failed to get user ID: {e}")
     exit()
 
-# ====== STEP 1: いいね＋フォロー ======
+# ====== STEP 1: 自動いいね＋フォロー ======
 query = "#wagyu OR #halalburger"
 
 try:
@@ -50,7 +50,7 @@ if tweets:
         except Exception as e:
             print(f"Like/Follow error: {e}")
 
-# ====== STEP 2: アンフォロー（500人超過時のみ、最大30件） ======
+# ====== STEP 2: 自動アンフォロー（500件超過時） ======
 try:
     following_response = client.get_users_following(id=my_user_id, max_results=1000)
     following_list = following_response.data if following_response and following_response.data else []
