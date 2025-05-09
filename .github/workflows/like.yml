@@ -2,7 +2,7 @@ name: X Auto Like
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # JST朝7時（UTC基準）
+    - cron: "15 0 * * *"  # ✅ 日本時間の午前9:15に実行（UTCで0:15）
   workflow_dispatch:
 
 jobs:
