@@ -11,8 +11,8 @@ client = tweepy.Client(
     access_token_secret=os.environ['ACCESS_TOKEN_SECRET']
 )
 
-# あなたのアカウント名に変更してください（@なし）
-my_username = "your_account_name"  # ← ここを書き換える！
+# ✅ Secretsからアカウント名を取得
+username = os.environ['TWITTER_USERNAME']
 
 # 自分のユーザーIDを取得
 try:
