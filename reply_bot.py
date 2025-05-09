@@ -22,7 +22,7 @@ username = os.environ["MY_USERNAME"]
 
 # 自分宛ての最新メンション（リプライ）を取得
 query = f"to:{username} -is:retweet"
-tweets = client.search_recent_tweets(query=query, max_results=5, tweet_fields=["author_id"]).data
+tweets = client.search_recent_tweets(query=query, max_results=10, tweet_fields=["author_id"]).data
 
 if tweets:
     for tweet in tweets:
