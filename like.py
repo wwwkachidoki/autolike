@@ -11,13 +11,21 @@ client = tweepy.Client(
 )
 
 query = "#wagyu OR #halalburger"
-tweets = client.search_recent_tweets(query=query, max_results=20).data
+
+try:
+    tweets = client.search_recent_tweets(query=query, max_results=10).data
+except Exception as e:
+    print(f"Search error: {e}")
+    exit()
 
 if tweets:
     for tweet in tweets:
         try:
             client.like(tweet.id)
             print(f"Liked tweet: {tweet.id}")
-            time.sleep(10)
+            time.sleep(5)
+        except tweepy.TooManyRequests:
+            print("Rate limit hit. Stopping.")
+            break
         except Exception as e:
             print(f"Error: {e}")
