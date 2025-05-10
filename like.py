@@ -26,7 +26,7 @@ except Exception as e:
 query = "#wagyu OR #halalburger"
 
 try:
-    tweets = client.search_recent_tweets(query=query, max_results=7, tweet_fields=["author_id"]).data
+    tweets = client.search_recent_tweets(query=query, max_results=10, tweet_fields=["author_id"]).data
 except tweepy.TooManyRequests:
     print("Rate limit reached. Try again later.")
     exit()
