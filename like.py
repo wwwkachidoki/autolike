@@ -2,7 +2,7 @@ import tweepy
 import os
 import time
 
-# 認証
+# 認証# updated again
 client = tweepy.Client(
     bearer_token=os.environ['BEARER_TOKEN'],
     consumer_key=os.environ['API_KEY'],
