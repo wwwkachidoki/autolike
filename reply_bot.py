@@ -24,7 +24,7 @@ if not username:
     raise ValueError("❌ 環境変数 'MY_USERNAME' が設定されていません。")
 
 # クエリ構築 & ログ出力
-query = f"to:{username} -is:retweet"
+query = f'to:{username} -is:"retweet"'
 print(f"🟡 Query: {query}")
 
 # 自分宛ての最新メンションを取得
@@ -51,6 +51,7 @@ if tweets:
 
             user = client.get_user(id=tweet.author_id).data
             reply = f"@{user.username} {reply_text}"
+            
 
             client.create_tweet(in_reply_to_tweet_id=tweet.id, text=reply)
             print(f"✅ Replied to tweet: {tweet.id}")
