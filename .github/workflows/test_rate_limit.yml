@@ -1,0 +1,28 @@
+name: Test Rate Limit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test_rate_limit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Tweepy
+        run: pip install tweepy
+
+      - name: Run test_rate_limit.py
+        run: python test_rate_limit.py
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
+          API_SECRET: ${{ secrets.API_SECRET }}
+          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
+          BEARER_TOKEN: ${{ secrets.BEARER_TOKEN }}
