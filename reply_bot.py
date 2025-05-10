@@ -3,7 +3,8 @@ import openai
 import os
 from dotenv import load_dotenv
 
-load_dotenv()  # .envがある場合は使えるようにする
+# .envファイルの読み込み（ローカルテスト用）
+load_dotenv()
 
 # Twitter 認証
 client = tweepy.Client(
@@ -17,13 +18,27 @@ client = tweepy.Client(
 # OpenAI API 認証
 openai.api_key = os.environ["OPENAI_API_KEY"]
 
-# 自分のユーザー名（@なし）
-username = os.environ["MY_USERNAME"]
+# ユーザー名の取得とバリデーション（@なし）
+username = os.environ.get("MY_USERNAME")
+if not username:
+    raise ValueError("❌ 環境変数 'MY_USERNAME' が設定されていません。")
 
-# 自分宛ての最新メンション（リプライ）を取得
+# クエリ構築 & ログ出力
 query = f"to:{username} -is:retweet"
-tweets = client.search_recent_tweets(query=query, max_results=10, tweet_fields=["author_id"]).data
+print(f"🟡 Query: {query}")
 
+# 自分宛ての最新メンションを取得
+try:
+    tweets = client.search_recent_tweets(
+        query=query,
+        max_results=10,
+        tweet_fields=["author_id"]
+    ).data
+except Exception as e:
+    print(f"❌ 検索エラー: {e}")
+    exit()
+
+# ツイートに対して返信
 if tweets:
     for tweet in tweets:
         try:
@@ -34,15 +49,13 @@ if tweets:
             )
             reply_text = response.choices[0].message.content.strip()
 
-            # ユーザーID（@ではなく数値）からユーザー名を取得
             user = client.get_user(id=tweet.author_id).data
             reply = f"@{user.username} {reply_text}"
 
-            # リプライ投稿
             client.create_tweet(in_reply_to_tweet_id=tweet.id, text=reply)
             print(f"✅ Replied to tweet: {tweet.id}")
 
         except Exception as e:
-            print(f"❌ Error: {e}")
+            print(f"❌ リプライエラー: {e}")
 else:
-    print("🔍 No recent mentions found.")
+    print("🔍 リプライ対象のメンションは見つかりませんでした。")
