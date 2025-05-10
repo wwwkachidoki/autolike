@@ -2,7 +2,7 @@ import tweepy
 import os
 import time
 
-# 認証# updated again
+# 認証
 client = tweepy.Client(
     bearer_token=os.environ['BEARER_TOKEN'],
     consumer_key=os.environ['API_KEY'],
@@ -11,7 +11,6 @@ client = tweepy.Client(
     access_token_secret=os.environ['ACCESS_TOKEN_SECRET']
 )
 
-# アカウント名をSecretsから取得（例：wagyu_worldwide）
 username = os.environ['TWITTER_USERNAME']
 
 # 自分のユーザーIDを取得
@@ -22,17 +21,22 @@ except Exception as e:
     print(f"Failed to get user ID: {e}")
     exit()
 
-# ====== STEP 1: 自動いいね＋フォロー ======
+# ====== 自動いいね＋フォロー ======
 query = "#wagyu OR #halalburger"
 
-try:
-    tweets = client.search_recent_tweets(query=query, max_results=10, tweet_fields=["author_id"]).data
-except tweepy.TooManyRequests:
-    print("Rate limit reached. Try again later.")
-    exit()
-except Exception as e:
-    print(f"Search error: {e}")
-    exit()
+def safe_search(query, retries=3, delay=60):
+    for attempt in range(retries):
+        try:
+            return client.search_recent_tweets(query=query, max_results=10, tweet_fields=["author_id"]).data
+        except tweepy.TooManyRequests:
+            print(f"Rate limit reached. Waiting {delay} seconds... (Attempt {attempt+1}/{retries})")
+            time.sleep(delay)
+        except Exception as e:
+            print(f"Search error: {e}")
+            break
+    return None
+
+tweets = safe_search(query)
 
 if tweets:
     for tweet in tweets:
@@ -42,7 +46,6 @@ if tweets:
 
             client.follow_user(tweet.author_id)
             print(f"Followed user: {tweet.author_id}")
-
             time.sleep(5)
         except tweepy.TooManyRequests:
             print("Rate limit hit during like/follow. Stopping.")
@@ -50,7 +53,7 @@ if tweets:
         except Exception as e:
             print(f"Like/Follow error: {e}")
 
-# ====== STEP 2: 自動アンフォロー（500件超過時） ======
+# ====== 自動アンフォロー（500件超過時） ======
 try:
     following_response = client.get_users_following(id=my_user_id, max_results=1000)
     following_list = following_response.data if following_response and following_response.data else []
