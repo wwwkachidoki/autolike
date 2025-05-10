@@ -25,6 +25,7 @@ if not username:
 
 # クエリ構築 & ログ出力
 query = f'to:{username} -is:"retweet"'
+
 print(f"🟡 Query: {query}")
 
 # 自分宛ての最新メンションを取得
