@@ -1,9 +1,10 @@
+import os
 import tweepy
 import openai
-import os
+from openai import OpenAI
 from dotenv import load_dotenv
 
-# .envファイルの読み込み（ローカルテスト用）
+# .env 読み込み（ローカル実行時）
 load_dotenv()
 
 # Twitter 認証
@@ -15,20 +16,17 @@ client = tweepy.Client(
     access_token_secret=os.environ["ACCESS_TOKEN_SECRET"]
 )
 
-# OpenAI API 認証
-openai.api_key = os.environ["OPENAI_API_KEY"]
+# OpenAI 認証（新バージョン対応）
+openai_client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
-# ユーザー名の取得とバリデーション（@なし）
-username = os.environ.get("MY_USERNAME")
+# ユーザー名の取得（@なし）
+username = os.environ.get("TWITTER_USERNAME")
 if not username:
-    raise ValueError("❌ 環境変数 'MY_USERNAME' が設定されていません。")
+    raise ValueError("❌ 環境変数 'TWITTER_USERNAME' が設定されていません。")
 
-# クエリ構築 & ログ出力
 query = f'to:{username} -is:"retweet"'
-
 print(f"🟡 Query: {query}")
 
-# 自分宛ての最新メンションを取得
 try:
     tweets = client.search_recent_tweets(
         query=query,
@@ -39,12 +37,11 @@ except Exception as e:
     print(f"❌ 検索エラー: {e}")
     exit()
 
-# ツイートに対して返信
 if tweets:
     for tweet in tweets:
         try:
             prompt = f"お客様からの質問に、丁寧で自然な敬語で返信してください：{tweet.text}"
-            response = openai.ChatCompletion.create(
+            response = openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[{"role": "user", "content": prompt}]
             )
@@ -52,8 +49,6 @@ if tweets:
 
             user = client.get_user(id=tweet.author_id).data
             reply = f"@{user.username} {reply_text}"
-            
-
             client.create_tweet(in_reply_to_tweet_id=tweet.id, text=reply)
             print(f"✅ Replied to tweet: {tweet.id}")
 
