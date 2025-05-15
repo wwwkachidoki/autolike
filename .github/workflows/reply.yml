@@ -1,8 +1,8 @@
 name: Auto Reply Bot
 
-on:
-  schedule:
-    - cron: "30 0 * * *"  # 毎日9:30 JST（UTC 0:30）
+#on:
+#  schedule:
+#    - cron: "30 0 * * *"  # 毎日9:30 JST（UTC 0:30）
   workflow_dispatch:
 
 jobs:
