@@ -1,9 +1,10 @@
 name: X Auto Like
 
-on:
-  schedule:
-    - cron: "15 0 * * *"  # ✅ 日本時間の午前9:15に実行（UTCで0:15）
+# on:
+#   schedule:
+#     - cron: '0 14 * * *'
   workflow_dispatch:
+
 
 jobs:
   like_job:
